@@ -129,7 +129,6 @@ class MainFragment : Fragment() {
             weatherItem.today
         )
         model.liveDataCurrent.value = item
-        Log.d("MyLog", "MinT: ${item.minTemp}")
 
     }
 

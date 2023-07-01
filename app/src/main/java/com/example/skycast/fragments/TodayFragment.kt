@@ -5,16 +5,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.skycast.MainViewModel
 import com.example.skycast.R
 import com.example.skycast.adapters.WeatherAdapter
 import com.example.skycast.adapters.WeatherModel
 import com.example.skycast.databinding.FragmentMainBinding
 import com.example.skycast.databinding.FragmentTodayBinding
+import org.json.JSONArray
+import org.json.JSONObject
 
 class TodayFragment : Fragment() {
     private lateinit var binding: FragmentTodayBinding
     private lateinit var adapter: WeatherAdapter
+    private val model: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,41 +32,35 @@ class TodayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRcView()
+        model.liveDataCurrent.observe(viewLifecycleOwner) {
+            adapter.submitList(getTodayList(it))
+        }
     }
 
     private fun initRcView() = with(binding){
         rcView.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         adapter = WeatherAdapter()
         rcView.adapter = adapter
-        val list = listOf(
-            WeatherModel("",
-                "12:00",
-                "Sunny",
-                "26",
-                "",
-                "",
-                "",
-                ""),
-            WeatherModel("",
-                "13:00",
-                "Sunny",
-                "26",
-                "",
-                "",
-                "",
-                ""),
-            WeatherModel("",
-                "14:00",
-                "Sunny",
-                "29",
-                "",
-                "",
-                "",
-                "")
 
+    }
 
-        )
-        adapter.submitList(list)
+    private fun getTodayList(wItem: WeatherModel): List<WeatherModel> {
+        val todayArray = JSONArray(wItem.today)
+        val list = ArrayList<WeatherModel>()
+        for (i in 0 until todayArray.length()) {
+            val item = WeatherModel(
+                "",
+                (todayArray[i] as JSONObject).getString("time"),
+                (todayArray[i] as JSONObject).getJSONObject("condition").getString("text"),
+                (todayArray[i] as JSONObject).getString("temp_c"),
+                "",
+                "",
+                (todayArray[i] as JSONObject).getJSONObject("condition").getString("icon"),
+                ""
+            )
+            list.add(item)
+        }
+        return list
     }
 
     companion object {
