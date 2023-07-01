@@ -7,19 +7,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TableLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.skycast.MainViewModel
 import com.example.skycast.R
 import com.example.skycast.adapters.VpAdapter
 import com.example.skycast.adapters.WeatherModel
 import com.example.skycast.databinding.FragmentMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
 const val API_KEY = "6fd38ba823a94ded872140417233006"
@@ -35,6 +37,7 @@ class MainFragment : Fragment() {
     )
     private lateinit var pLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
+    private val model: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +51,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         init()
+        updateCurrentCard()
         requestWeatherData("London")
     }
 
@@ -57,6 +61,17 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, vp) {
             tab, pos -> tab.text = tList[pos]
         }.attach()
+    }
+
+    private fun updateCurrentCard() = with(binding) {
+        model.liveDataCurrent.observe(viewLifecycleOwner) {
+            tvCity.text = it.city
+            tvDate.text = it.time
+            val temp = "${it.currentTemp}°C"
+            tvCurrentTemp.text = temp
+            tvConditionMain.text = it.condition
+            Picasso.get().load("https:" + it.imgUrl).into(imgV)
+        }
     }
 
     private fun permissionListener() {
@@ -113,6 +128,7 @@ class MainFragment : Fragment() {
             mainObject.getJSONObject("current").getJSONObject("condition").getString("icon"),
             weatherItem.today
         )
+        model.liveDataCurrent.value = item
         Log.d("MyLog", "MinT: ${item.minTemp}")
 
     }
