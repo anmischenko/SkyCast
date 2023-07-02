@@ -33,7 +33,7 @@ class MainFragment : Fragment() {
     )
     private val tList = listOf(
         "Today",
-        "Days"
+        "3 Days"
     )
     private lateinit var pLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
@@ -67,8 +67,7 @@ class MainFragment : Fragment() {
         model.liveDataCurrent.observe(viewLifecycleOwner) {
             tvCity.text = it.city
             tvDate.text = it.time
-            val temp = "${it.currentTemp}°C"
-            tvCurrentTemp.text = temp
+            tvCurrentTemp.text = "${it.currentTemp.ifEmpty { "${it.minTemp}°C / ${it.maxTemp}" }}°C"
             tvConditionMain.text = it.condition
             Picasso.get().load("https:" + it.imgUrl).into(imgV)
         }
@@ -94,7 +93,7 @@ class MainFragment : Fragment() {
                 API_KEY +
                 "&q=" +
                 city +
-                "&days=5&aqi=no&alerts=no"
+                "&days=3&aqi=no&alerts=no"
         val queue = Volley.newRequestQueue(context)
         val request = StringRequest(
             Request.Method.GET,
@@ -140,16 +139,17 @@ class MainFragment : Fragment() {
             val day = daysArray[i] as JSONObject
             val item = WeatherModel(
                 name,
-                day.getString("day"),
+                day.getString("date"),
                 day.getJSONObject("day").getJSONObject("condition").getString("text"),
                 "",
-                day.getJSONObject("day").getString("maxtemp_c"),
-                day.getJSONObject("day").getString("mintemp_c"),
+                day.getJSONObject("day").getString("maxtemp_c").toFloat().toInt().toString(),
+                day.getJSONObject("day").getString("mintemp_c").toFloat().toInt().toString(),
                 day.getJSONObject("day").getJSONObject("condition").getString("icon"),
                 day.getJSONArray("hour").toString()
             )
             list.add(item)
         }
+        model.liveDataList.value = list
         return list
     }
 

@@ -31,15 +31,15 @@ class TodayFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRcView()
+        init()
         model.liveDataCurrent.observe(viewLifecycleOwner) {
             adapter.submitList(getTodayList(it))
         }
     }
 
-    private fun initRcView() = with(binding){
+    private fun init() = with(binding){
         rcView.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-        adapter = WeatherAdapter()
+        adapter = WeatherAdapter(null)
         rcView.adapter = adapter
 
     }
