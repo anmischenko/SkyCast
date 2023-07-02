@@ -44,6 +44,7 @@ dependencies {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
     }
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'androidx.fragment:fragment-ktx:1.6.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
