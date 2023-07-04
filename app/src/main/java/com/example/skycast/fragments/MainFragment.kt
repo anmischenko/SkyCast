@@ -1,8 +1,12 @@
 package com.example.skycast.fragments
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.skycast.DialogManager
 import com.example.skycast.MainViewModel
 import com.example.skycast.R
 import com.example.skycast.adapters.VpAdapter
@@ -26,6 +31,7 @@ import com.example.skycast.databinding.FragmentMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
@@ -60,7 +66,6 @@ class MainFragment : Fragment() {
         checkPermission()
         init()
         updateCurrentCard()
-        getLocation()
         swipeRL.setOnRefreshListener {
             init()
             updateCurrentCard()
@@ -77,11 +82,44 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, vp) {
             tab, pos -> tab.text = tList[pos]
         }.attach()
+        ibSearch.setOnClickListener {
+            DialogManager.searchByNameDialog(requireContext(), object : DialogManager.Listener {
+                override fun onClick(name: String?) {
+                    if (name != null) {
+                        requestWeatherData(name)
+                    }
+                }
+
+            })
+
+        }
         ibSync.setOnClickListener {
             tabLayout.selectTab(tabLayout.getTabAt(0))
-            getLocation()
+            checkLocation()
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocation()
+    }
+
+    private fun checkLocation() {
+        if (isLocationEnabled()) {
+            getLocation()
+        } else {
+            DialogManager.locationSettingsDialog(requireContext(), object : DialogManager.Listener{
+                override fun onClick(namr: String?) {
+                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+            })
+        }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val lm = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     private fun getLocation() {
@@ -98,7 +136,7 @@ class MainFragment : Fragment() {
             return
         }
         fLocationClient
-            .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, ct.token)
+            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, ct.token)
             .addOnCompleteListener{
                 requestWeatherData("${it.result.latitude},${it.result.longitude}")
             }
