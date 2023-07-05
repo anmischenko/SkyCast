@@ -56,7 +56,10 @@ class TodayFragment : Fragment() {
                 "",
                 "",
                 (todayArray[i] as JSONObject).getJSONObject("condition").getString("icon"),
-                ""
+                "",
+                (todayArray[i] as JSONObject).getString("wind_mph"),
+                (todayArray[i] as JSONObject).getString("humidity"),
+                (todayArray[i] as JSONObject).getString("vis_km")
             )
             list.add(item)
         }

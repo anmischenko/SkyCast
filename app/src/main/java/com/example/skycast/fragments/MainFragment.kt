@@ -8,14 +8,14 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -58,7 +58,35 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = with(binding) {
+        return when (item.itemId) {
+            R.id.sync -> {
+                tabLayout.selectTab(tabLayout.getTabAt(0))
+                checkLocation()
+                true
+            }
+            R.id.search -> {
+                DialogManager.searchByNameDialog(requireContext(), object : DialogManager.Listener {
+                    override fun onClick(name: String?) {
+                        if (name != null) {
+                            requestWeatherData(name)
+                        }
+                    }
+
+                })
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
@@ -82,22 +110,6 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, vp) {
             tab, pos -> tab.text = tList[pos]
         }.attach()
-        ibSearch.setOnClickListener {
-            DialogManager.searchByNameDialog(requireContext(), object : DialogManager.Listener {
-                override fun onClick(name: String?) {
-                    if (name != null) {
-                        requestWeatherData(name)
-                    }
-                }
-
-            })
-
-        }
-        ibSync.setOnClickListener {
-            tabLayout.selectTab(tabLayout.getTabAt(0))
-            checkLocation()
-        }
-
     }
 
     override fun onResume() {
@@ -150,6 +162,10 @@ class MainFragment : Fragment() {
             tvCurrentTemp.text = "${it.currentTemp.ifEmpty { "${it.minTemp}°C / ${it.maxTemp}" }}°C"
             tvConditionMain.text = it.condition
             Picasso.get().load("https:" + it.imgUrl).into(imgV)
+            val wind = (it.wind.toFloat() / 2.237).toInt().toString()
+            tvWind.text = "${wind} m/s"
+            tvHumidity.text = "${it.humidity.toFloat().toInt().toString()} %"
+            tvVisibility.text = "${it.visibility.toFloat().toInt().toString()} km"
         }
     }
 
@@ -205,8 +221,12 @@ class MainFragment : Fragment() {
             weatherItem.maxTemp,
             weatherItem.minTemp,
             mainObject.getJSONObject("current").getJSONObject("condition").getString("icon"),
-            weatherItem.today
-        )
+            weatherItem.today,
+            mainObject.getJSONObject("current").getString("wind_mph"),
+            mainObject.getJSONObject("current").getString("humidity"),
+            mainObject.getJSONObject("current").getString("vis_km"),
+
+            )
         model.liveDataCurrent.value = item
 
     }
@@ -225,7 +245,11 @@ class MainFragment : Fragment() {
                 day.getJSONObject("day").getString("maxtemp_c").toFloat().toInt().toString(),
                 day.getJSONObject("day").getString("mintemp_c").toFloat().toInt().toString(),
                 day.getJSONObject("day").getJSONObject("condition").getString("icon"),
-                day.getJSONArray("hour").toString()
+                day.getJSONArray("hour").toString(),
+                day.getJSONObject("day").getString("maxwind_mph"),
+                day.getJSONObject("day").getString("avghumidity"),
+                day.getJSONObject("day").getString("avgvis_km"),
+
             )
             list.add(item)
         }

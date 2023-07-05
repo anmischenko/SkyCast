@@ -28,6 +28,7 @@ class WeatherAdapter(val listener: Listener?) : ListAdapter<WeatherModel, Weathe
             //val temp = "${item.currentTemp}°C"
             tvTemp.text = "${item.currentTemp.ifEmpty { "${item.minTemp}°C / ${item.maxTemp}" }}°C"
             Picasso.get().load("https:" + item.imgUrl).into(imgToday)
+
         }
     }
 

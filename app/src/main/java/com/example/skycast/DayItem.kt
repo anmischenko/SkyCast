@@ -8,5 +8,8 @@ data class DayItem(
     val currentTemp: String,
     val maxTemp: String,
     val minTemp: String,
-    val hours: String
+    val hours: String,
+    val wind: String,
+    val humidity: String,
+    val visibility: String
 )

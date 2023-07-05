@@ -8,15 +8,15 @@
     tools:context=".fragments.MainFragment">
 
     <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
-            android:layout_width="409dp"
-            android:layout_height="450dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        android:id="@+id/cardView"
+        android:layout_width="409dp"
+        android:layout_height="420dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRL"
@@ -24,38 +24,17 @@
             android:layout_height="wrap_content">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@null">
 
-            <ImageButton
-                    android:id="@+id/ibSearch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:src="@drawable/ic_baseline_search_24"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/ibSync"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:src="@drawable/ic_baseline_sync_24"
-                    app:layout_constraintEnd_toStartOf="@+id/ibSearch"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tvCity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="60dp"
+                    android:layout_marginTop="10dp"
                     android:fontFamily="@font/alumni_sans_regular"
                     android:text="Санкт-Петербург"
                     android:textColor="@color/black"
@@ -72,7 +51,7 @@
                     android:fontFamily="@font/alumni_sans_regular"
                     android:text="20/07/2023 13:00"
                     android:textColor="@color/black"
-                    android:textSize="40sp"
+                    android:textSize="30sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvCity" />
@@ -99,10 +78,10 @@
                     android:fontFamily="@font/alumni_sans_regular"
                     android:text="Солнечно"
                     android:textColor="@color/black"
-                    android:textSize="40sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imgV" />
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvCurrentTemp"
+                    app:layout_constraintStart_toStartOf="@+id/tvCurrentTemp"
+                    app:layout_constraintTop_toBottomOf="@+id/tvCurrentTemp" />
 
                 <ImageView
                     android:id="@+id/imgV"
@@ -114,9 +93,79 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvDate"
                     tools:src="@tools:sample/avatars" />
 
+                <ImageView
+                    android:id="@+id/imgVisibility"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="50dp"
+                    android:alpha="0.7"
+                    android:src="@drawable/visibility"
+                    app:layout_constraintStart_toEndOf="@+id/humidity"
+                    app:layout_constraintTop_toTopOf="@+id/humidity" />
+
+                <ImageView
+                    android:id="@+id/wind"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="50dp"
+                    android:alpha="0.7"
+                    android:src="@drawable/wind"
+                    app:layout_constraintEnd_toStartOf="@+id/humidity"
+                    app:layout_constraintTop_toTopOf="@+id/humidity" />
+
+                <ImageView
+                    android:id="@+id/humidity"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="10dp"
+                    android:alpha="0.7"
+                    android:src="@drawable/humidity"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/imgV" />
+
+                <TextView
+                    android:id="@+id/tvWind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/alumni_sans_variable_font_wght"
+                    android:text="10 km/h"
+                    android:textColor="@color/black"
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toEndOf="@+id/wind"
+                    app:layout_constraintStart_toStartOf="@+id/wind"
+                    app:layout_constraintTop_toBottomOf="@+id/wind" />
+
+                <TextView
+                    android:id="@+id/tvVisibility"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/alumni_sans_variable_font_wght"
+                    android:text="14 km"
+                    android:textColor="@color/black"
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toEndOf="@+id/imgVisibility"
+                    app:layout_constraintStart_toStartOf="@+id/imgVisibility"
+                    app:layout_constraintTop_toBottomOf="@+id/imgVisibility" />
+
+                <TextView
+                    android:id="@+id/tvHumidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/alumni_sans_variable_font_wght"
+                    android:text="50%"
+                    android:textColor="@color/black"
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toEndOf="@+id/humidity"
+                    app:layout_constraintStart_toStartOf="@+id/humidity"
+                    app:layout_constraintTop_toBottomOf="@+id/humidity" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        </androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

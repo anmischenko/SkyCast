@@ -10,6 +10,8 @@ data class WeatherModel(
     val maxTemp: String,
     val minTemp: String,
     val imgUrl: String,
-    val today: String
-
+    val today: String,
+    val wind: String,
+    val humidity: String,
+    val visibility: String
 )
