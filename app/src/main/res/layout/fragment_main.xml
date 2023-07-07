@@ -10,7 +10,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="409dp"
-        android:layout_height="420dp"
+        android:layout_height="400dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
@@ -36,39 +36,26 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/alumni_sans_regular"
-                    android:text="Санкт-Петербург"
                     android:textColor="@color/black"
                     android:textSize="40sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/alumni_sans_regular"
-                    android:text="20/07/2023 13:00"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvCity" />
 
                 <TextView
                     android:id="@+id/tvCurrentTemp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/alumni_sans_regular"
-                    android:text="26°C"
                     android:textColor="@color/black"
                     android:textSize="50sp"
                     app:layout_constraintBottom_toBottomOf="@+id/imgV"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.4"
+                    app:layout_constraintHorizontal_bias="0.402"
                     app:layout_constraintStart_toEndOf="@+id/imgV"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDate" />
+                    app:layout_constraintTop_toTopOf="@+id/imgV"
+                    app:layout_constraintVertical_bias="0.25" />
 
                 <TextView
                     android:id="@+id/tvConditionMain"
@@ -76,7 +63,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/alumni_sans_regular"
-                    android:text="Солнечно"
                     android:textColor="@color/black"
                     android:textSize="30sp"
                     app:layout_constraintEnd_toEndOf="@+id/tvCurrentTemp"
@@ -90,7 +76,7 @@
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="10dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvDate"
+                    app:layout_constraintTop_toBottomOf="@+id/tvCity"
                     tools:src="@tools:sample/avatars" />
 
                 <ImageView
@@ -100,26 +86,29 @@
                     android:layout_marginStart="50dp"
                     android:alpha="0.7"
                     android:src="@drawable/visibility"
-                    app:layout_constraintStart_toEndOf="@+id/humidity"
-                    app:layout_constraintTop_toTopOf="@+id/humidity" />
+                    android:visibility="invisible"
+                    app:layout_constraintStart_toEndOf="@+id/imgHumidity"
+                    app:layout_constraintTop_toTopOf="@+id/imgHumidity" />
 
                 <ImageView
-                    android:id="@+id/wind"
+                    android:id="@+id/imgWind"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginEnd="50dp"
                     android:alpha="0.7"
                     android:src="@drawable/wind"
-                    app:layout_constraintEnd_toStartOf="@+id/humidity"
-                    app:layout_constraintTop_toTopOf="@+id/humidity" />
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toStartOf="@+id/imgHumidity"
+                    app:layout_constraintTop_toTopOf="@+id/imgHumidity" />
 
                 <ImageView
-                    android:id="@+id/humidity"
+                    android:id="@+id/imgHumidity"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginTop="10dp"
                     android:alpha="0.7"
                     android:src="@drawable/humidity"
+                    android:visibility="invisible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imgV" />
@@ -130,12 +119,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/alumni_sans_variable_font_wght"
-                    android:text="10 km/h"
                     android:textColor="@color/black"
                     android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="@+id/wind"
-                    app:layout_constraintStart_toStartOf="@+id/wind"
-                    app:layout_constraintTop_toBottomOf="@+id/wind" />
+                    app:layout_constraintEnd_toEndOf="@+id/imgWind"
+                    app:layout_constraintStart_toStartOf="@+id/imgWind"
+                    app:layout_constraintTop_toBottomOf="@+id/imgWind" />
 
                 <TextView
                     android:id="@+id/tvVisibility"
@@ -143,7 +131,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/alumni_sans_variable_font_wght"
-                    android:text="14 km"
                     android:textColor="@color/black"
                     android:textSize="30sp"
                     app:layout_constraintEnd_toEndOf="@+id/imgVisibility"
@@ -156,12 +143,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/alumni_sans_variable_font_wght"
-                    android:text="50%"
                     android:textColor="@color/black"
                     android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="@+id/humidity"
-                    app:layout_constraintStart_toStartOf="@+id/humidity"
-                    app:layout_constraintTop_toBottomOf="@+id/humidity" />
+                    app:layout_constraintEnd_toEndOf="@+id/imgHumidity"
+                    app:layout_constraintStart_toStartOf="@+id/imgHumidity"
+                    app:layout_constraintTop_toBottomOf="@+id/imgHumidity" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -178,12 +164,12 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Today" />
+            android:text="@string/tabItemText1" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3 days" />
+            android:text="@string/tabItemText2" />
 
     </com.google.android.material.tabs.TabLayout>
 

@@ -4,17 +4,18 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.EditText
 
+
 object DialogManager {
     fun locationSettingsDialog(context: Context, listener: Listener) {
         val builder = AlertDialog.Builder(context)
         val dialog = builder.create()
-        dialog.setTitle("Enable location?")
-        dialog.setMessage("Location disabled, do you want enable location?")
+        dialog.setTitle(R.string.location)
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _,_ ->
             listener.onClick(null)
             dialog.dismiss()
         }
         dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") { _,_ ->
+            listener.onClickNot()
             dialog.dismiss()
         }
         dialog.show()
@@ -25,12 +26,12 @@ object DialogManager {
         val name = EditText(context)
         builder.setView(name)
         val dialog = builder.create()
-        dialog.setTitle("City name:")
+        dialog.setTitle(R.string.cityName)
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK") { _,_ ->
             listener.onClick(name.text.toString())
             dialog.dismiss()
         }
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") { _,_ ->
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") { _, _ ->
             dialog.dismiss()
         }
         dialog.show()
@@ -38,5 +39,6 @@ object DialogManager {
 
     interface Listener {
         fun onClick(name: String?)
+        fun onClickNot()
     }
 }

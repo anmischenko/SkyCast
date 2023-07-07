@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.skycast.R
 import com.example.skycast.databinding.ListItemBinding
 import com.squareup.picasso.Picasso
-
+import java.text.SimpleDateFormat
 
 class WeatherAdapter(val listener: Listener?) : ListAdapter<WeatherModel, WeatherAdapter.Holder>(Comparator()) {
     class Holder(view: View, val listener: Listener?) : RecyclerView.ViewHolder(view) {
-        val binding = ListItemBinding.bind(view)
-        var itemTemp: WeatherModel? = null
+        private val binding = ListItemBinding.bind(view)
+        private var itemTemp: WeatherModel? = null
         init {
             itemView.setOnClickListener {
                 itemTemp?.let { it1 -> listener?.onClick(it1) }
@@ -23,12 +23,23 @@ class WeatherAdapter(val listener: Listener?) : ListAdapter<WeatherModel, Weathe
 
         fun bind(item: WeatherModel) = with(binding) {
             itemTemp = item
-            tvDateI.text = item.time
+            tvDateI.text = dateOrHour(item.currentTemp.isEmpty(), item.time)
             tvCondition.text = item.condition
-            //val temp = "${item.currentTemp}°C"
             tvTemp.text = "${item.currentTemp.ifEmpty { "${item.minTemp}°C / ${item.maxTemp}" }}°C"
             Picasso.get().load("https:" + item.imgUrl).into(imgToday)
 
+        }
+
+        private fun dateOrHour(str: Boolean, date: String) : String {
+            val result = if (str) {
+                val dateNum = date.substringBefore(" ")
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd")
+                val outputFormat = SimpleDateFormat("dd.MM")
+                outputFormat.format(inputFormat.parse(dateNum))
+            } else {
+                date.substringAfter(" ")
+            }
+            return result
         }
     }
 

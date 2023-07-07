@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkyCast</string>
+    <string name="tabItemText1">Сегодня</string>
+    <string name="tabItemText2">3 дня</string>
+    <string name="location">Включить определение местоположения?</string>
+    <string name="defaultCity">Если вы не дадите разрешения, то по умолчанию будет указан город Москва</string>
+    <string name="cancel">Отменить</string>
+    <string name="cityName">Введите название города:</string>
+</resources>

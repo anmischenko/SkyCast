@@ -11,16 +11,13 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.skycast.DialogManager
 import com.example.skycast.MainViewModel
@@ -29,29 +26,33 @@ import com.example.skycast.adapters.VpAdapter
 import com.example.skycast.adapters.WeatherModel
 import com.example.skycast.databinding.FragmentMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
+import java.util.*
+import kotlin.collections.ArrayList
 
 const val API_KEY = "6fd38ba823a94ded872140417233006"
 class MainFragment : Fragment() {
 
+    val language = Locale.getDefault().getLanguage()
     private lateinit var fLocationClient: FusedLocationProviderClient
+    private lateinit var pLauncher: ActivityResultLauncher<String>
+    private lateinit var binding: FragmentMainBinding
+    private val model: MainViewModel by activityViewModels()
+
     private val fList = listOf(
         TodayFragment.newInstance(),
         DaysFragment.newInstance()
     )
+
     private val tList = listOf(
-        "Today",
-        "3 Days"
+        if (language == "ru") "Сегодня" else "Today",
+        if (language == "ru") "3 дня" else "3 Days"
     )
-    private lateinit var pLauncher: ActivityResultLauncher<String>
-    private lateinit var binding: FragmentMainBinding
-    private val model: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,6 +61,11 @@ class MainFragment : Fragment() {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocation()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -80,6 +86,10 @@ class MainFragment : Fragment() {
                         if (name != null) {
                             requestWeatherData(name)
                         }
+                    }
+
+                    override fun onClickNot() {
+                        requestWeatherData(if (language == "ru") "Москва" else "Moscow")
                     }
 
                 })
@@ -108,13 +118,8 @@ class MainFragment : Fragment() {
         val adapter = VpAdapter(activity as FragmentActivity, fList)
         vp.adapter = adapter
         TabLayoutMediator(tabLayout, vp) {
-            tab, pos -> tab.text = tList[pos]
+                tab, pos -> tab.text = tList[pos]
         }.attach()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        checkLocation()
     }
 
     private fun checkLocation() {
@@ -122,8 +127,12 @@ class MainFragment : Fragment() {
             getLocation()
         } else {
             DialogManager.locationSettingsDialog(requireContext(), object : DialogManager.Listener{
-                override fun onClick(namr: String?) {
+                override fun onClick(name: String?) {
                     startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+
+                override fun onClickNot() {
+                    requestWeatherData(if (language == "ru") "Москва" else "Moscow")
                 }
             })
         }
@@ -136,7 +145,6 @@ class MainFragment : Fragment() {
 
     private fun getLocation() {
         val ct = CancellationTokenSource()
-        // Если есть разрешение
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -158,14 +166,18 @@ class MainFragment : Fragment() {
     private fun updateCurrentCard() = with(binding) {
         model.liveDataCurrent.observe(viewLifecycleOwner) {
             tvCity.text = it.city
-            tvDate.text = it.time
             tvCurrentTemp.text = "${it.currentTemp.ifEmpty { "${it.minTemp}°C / ${it.maxTemp}" }}°C"
             tvConditionMain.text = it.condition
             Picasso.get().load("https:" + it.imgUrl).into(imgV)
+            val speed = if (language == "ru") "м/с" else "m/s"
             val wind = (it.wind.toFloat() / 2.237).toInt().toString()
-            tvWind.text = "${wind} m/s"
+            tvWind.text = "${wind} ${speed}"
             tvHumidity.text = "${it.humidity.toFloat().toInt().toString()} %"
-            tvVisibility.text = "${it.visibility.toFloat().toInt().toString()} km"
+            val distance = if (language == "ru") "км" else "km"
+            tvVisibility.text = "${it.visibility.toFloat().toInt().toString()} ${distance}"
+            imgHumidity.visibility = View.VISIBLE
+            imgWind.visibility = View.VISIBLE
+            imgVisibility.visibility = View.VISIBLE
         }
     }
 
@@ -175,8 +187,6 @@ class MainFragment : Fragment() {
         }
     }
 
-    // Проверка есть ли разрешение
-    // можно вывести сообщение, что не может пользоваться функциями какими-то
     private fun checkPermission() {
         if(!isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             permissionListener()
@@ -184,25 +194,29 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun requestWeatherData(city: String) {
+    private fun requestWeatherData(city: String?) {
         val url = "https://api.weatherapi.com/v1/forecast.json?key=" +
                 API_KEY +
                 "&q=" +
                 city +
-                "&days=3&aqi=no&alerts=no"
+                "&days=3&aqi=no&alerts=no" +
+                "&lang=" + language
         val queue = Volley.newRequestQueue(context)
-        val request = StringRequest(
+        val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
             url,
+            null,
             {
-                result -> parseWeatherData(result)
+                    result -> parseWeatherData(result.toString())
             },
             {
-                error -> Log.d("MyLog", "Error: $error")
+                    error -> Log.d("MyLog", "Error: $error")
             }
         )
-        queue.add(request)
+        queue.add(jsonObjectRequest)
+
     }
+
 
     private fun parseWeatherData(result: String) {
         val mainObject = JSONObject(result)

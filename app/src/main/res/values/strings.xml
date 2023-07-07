@@ -1,5 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SkyCast</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tabItemText1">Today</string>
+    <string name="tabItemText2">3 days</string>
+    <string name="location">Enable location?</string>
+    <string name="defaultCity">If you do not give permission, the default will be the city of Moscow</string>
+    <string name="cancel">Cancel</string>
+    <string name="cityName">Enter the name of the city:</string>
 </resources>
