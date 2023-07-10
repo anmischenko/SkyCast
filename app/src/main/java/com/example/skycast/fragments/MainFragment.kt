@@ -63,9 +63,18 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
+    override fun onResume() = with(binding) {
         super.onResume()
         checkLocation()
+        imgWind.setOnClickListener{
+            Toast.makeText(activity, getString(R.string.wind), Toast.LENGTH_SHORT).show()
+        }
+        imgHumidity.setOnClickListener{
+            Toast.makeText(activity, getString(R.string.humidity), Toast.LENGTH_SHORT).show()
+        }
+        imgVisibility.setOnClickListener{
+            Toast.makeText(activity, getString(R.string.visibility), Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -89,7 +98,7 @@ class MainFragment : Fragment() {
                     }
 
                     override fun onClickNot() {
-                        requestWeatherData(if (language == "ru") "Москва" else "Moscow")
+                        requestWeatherData(getString(R.string.moscow))
                     }
 
                 })
@@ -101,13 +110,16 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        vp.isUserInputEnabled = false
         checkPermission()
         init()
         updateCurrentCard()
         swipeRL.setOnRefreshListener {
             init()
             updateCurrentCard()
-            getLocation()
+            if (!isLocationEnabled()) {
+                requestWeatherData(getString(R.string.moscow))
+            }
             swipeRL.isRefreshing = false
         }
     }
@@ -132,7 +144,7 @@ class MainFragment : Fragment() {
                 }
 
                 override fun onClickNot() {
-                    requestWeatherData(if (language == "ru") "Москва" else "Moscow")
+                    requestWeatherData(getString(R.string.moscow))
                 }
             })
         }
@@ -168,7 +180,8 @@ class MainFragment : Fragment() {
             tvCity.text = it.city
             tvCurrentTemp.text = "${it.currentTemp.ifEmpty { "${it.minTemp}°C / ${it.maxTemp}" }}°C"
             tvConditionMain.text = it.condition
-            Picasso.get().load("https:" + it.imgUrl).into(imgV)
+            val strImg = it.imgUrl.replace("64", "128")
+            Picasso.get().load("https:" + strImg).into(imgV)
             val speed = if (language == "ru") "м/с" else "m/s"
             val wind = (it.wind.toFloat() / 2.237).toInt().toString()
             tvWind.text = "${wind} ${speed}"

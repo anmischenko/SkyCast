@@ -34,7 +34,6 @@ class DaysFragment : Fragment(), WeatherAdapter.Listener {
         init()
         model.liveDataList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        //adapter.submitList(it.subList(1, it.size))
         }
     }
 

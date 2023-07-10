@@ -7,4 +7,8 @@
     <string name="defaultCity">Если вы не дадите разрешения, то по умолчанию будет указан город Москва</string>
     <string name="cancel">Отменить</string>
     <string name="cityName">Введите название города:</string>
+    <string name="wind">Скорость ветра</string>
+    <string name="humidity">Влажность воздуха</string>
+    <string name="visibility">Дальность видимости</string>
+    <string name="moscow">Москва</string>
 </resources>

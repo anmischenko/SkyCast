@@ -8,10 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.skycast.MainViewModel
-import com.example.skycast.R
 import com.example.skycast.adapters.WeatherAdapter
 import com.example.skycast.adapters.WeatherModel
-import com.example.skycast.databinding.FragmentMainBinding
 import com.example.skycast.databinding.FragmentTodayBinding
 import org.json.JSONArray
 import org.json.JSONObject
@@ -47,7 +45,7 @@ class TodayFragment : Fragment() {
     private fun getTodayList(wItem: WeatherModel): List<WeatherModel> {
         val todayArray = JSONArray(wItem.today)
         val list = ArrayList<WeatherModel>()
-        for (i in 0 until todayArray.length()) {
+        for (i in 0 until todayArray.length() step 3) {
             val item = WeatherModel(
                 "",
                 (todayArray[i] as JSONObject).getString("time"),
