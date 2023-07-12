@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -65,7 +66,6 @@ class MainFragment : Fragment() {
 
     override fun onResume() = with(binding) {
         super.onResume()
-        checkLocation()
         imgWind.setOnClickListener{
             Toast.makeText(activity, getString(R.string.wind), Toast.LENGTH_SHORT).show()
         }
@@ -87,6 +87,7 @@ class MainFragment : Fragment() {
             R.id.sync -> {
                 tabLayout.selectTab(tabLayout.getTabAt(0))
                 checkLocation()
+                permission()
                 true
             }
             R.id.search -> {
@@ -114,12 +115,11 @@ class MainFragment : Fragment() {
         checkPermission()
         init()
         updateCurrentCard()
+        checkLocation()
         swipeRL.setOnRefreshListener {
             init()
             updateCurrentCard()
-            if (!isLocationEnabled()) {
-                requestWeatherData(getString(R.string.moscow))
-            }
+            checkLocation()
             swipeRL.isRefreshing = false
         }
     }
@@ -132,6 +132,7 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, vp) {
                 tab, pos -> tab.text = tList[pos]
         }.attach()
+        Log.d("MyLog", "tyt")
     }
 
     private fun checkLocation() {
@@ -171,6 +172,7 @@ class MainFragment : Fragment() {
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, ct.token)
             .addOnCompleteListener{
                 requestWeatherData("${it.result.latitude},${it.result.longitude}")
+                Log.d("MyLog", it.result.latitude.toString() + "    " + it.result.longitude)
             }
 
     }
@@ -197,6 +199,22 @@ class MainFragment : Fragment() {
     private fun permissionListener() {
         pLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             Toast.makeText(activity, "Permission is $it", Toast.LENGTH_LONG).show()
+            checkLocation()
+            if (!it) {
+                DialogManager.permissionDialog(requireContext(), object : DialogManager.Listener{
+                    override fun onClick(name: String?) {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val packageName = "com.example.skycast"
+                        val uri = Uri.fromParts("package", packageName, null)
+                        intent.data = uri
+                        startActivity(intent)
+                    }
+
+                    override fun onClickNot() {
+                        requestWeatherData(getString(R.string.moscow))
+                    }
+                })
+            }
         }
     }
 
@@ -207,13 +225,39 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun requestWeatherData(city: String?) {
+    private fun permission() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            DialogManager.permissionDialog(requireContext(), object : DialogManager.Listener{
+                override fun onClick(name: String?) {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val packageName = "com.example.skycast"
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                }
+
+                override fun onClickNot() {
+                    requestWeatherData(getString(R.string.moscow))
+                }
+            })
+        }
+    }
+
+    private fun requestWeatherData(city: String) {
         val url = "https://api.weatherapi.com/v1/forecast.json?key=" +
                 API_KEY +
                 "&q=" +
                 city +
                 "&days=3&aqi=no&alerts=no" +
                 "&lang=" + language
+        Log.d("MyLog", url)
         val queue = Volley.newRequestQueue(context)
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
@@ -239,7 +283,7 @@ class MainFragment : Fragment() {
     }
 
     private fun parseCurrentData(mainObject: JSONObject, weatherItem: WeatherModel) {
-
+        Log.d("MyLog", mainObject.toString())
         val item = WeatherModel(
             mainObject.getJSONObject("location").getString("name"),
             mainObject.getJSONObject("current").getString("last_updated"),
